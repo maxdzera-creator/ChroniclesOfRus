@@ -1,0 +1,12 @@
+{
+  "name": "ChroniclesOfRus.Editor",
+  "rootNamespace": "ChroniclesOfRus.Editor",
+  "references": [
+    "ChroniclesOfRus.Game",
+    "Unity.InputSystem"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "autoReferenced": true
+}

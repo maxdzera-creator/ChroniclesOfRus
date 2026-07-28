@@ -1,0 +1,8 @@
+{
+  "name": "ChroniclesOfRus.Game",
+  "rootNamespace": "ChroniclesOfRus",
+  "references": [
+    "Unity.InputSystem"
+  ],
+  "autoReferenced": true
+}
