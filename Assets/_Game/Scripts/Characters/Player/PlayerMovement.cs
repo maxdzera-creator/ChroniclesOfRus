@@ -59,7 +59,7 @@ namespace ChroniclesOfRus.Characters.Player
                 verticalVelocity = groundedVerticalSpeed;
         }
 
-        private Vector3 GetCameraRelativeDirection(Vector2 input)
+        public Vector3 GetCameraRelativeDirection(Vector2 input)
         {
             if (input.sqrMagnitude <= 0f)
                 return Vector3.zero;
@@ -72,6 +72,31 @@ namespace ChroniclesOfRus.Characters.Player
             right.Normalize();
 
             return Vector3.ClampMagnitude(forward * input.y + right * input.x, 1f);
+        }
+
+        public void BeginControlledMovement()
+        {
+            horizontalVelocity = Vector3.zero;
+        }
+
+        public void MoveControlled(Vector3 horizontalDisplacement, float deltaTime)
+        {
+            UpdateGravity(deltaTime);
+            Vector3 displacement = horizontalDisplacement + Vector3.up * (verticalVelocity * deltaTime);
+            CollisionFlags flags = characterController.Move(displacement);
+            if ((flags & CollisionFlags.Below) != 0 && verticalVelocity < 0f)
+                verticalVelocity = groundedVerticalSpeed;
+        }
+
+        public void RotateTowards(Vector3 direction, float rotationSpeed, float deltaTime)
+        {
+            direction.y = 0f;
+            if (direction.sqrMagnitude <= 0.0001f)
+                return;
+
+            Quaternion targetRotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation, targetRotation, rotationSpeed * deltaTime);
         }
 
         private void UpdateRotation(float deltaTime)

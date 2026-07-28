@@ -25,7 +25,8 @@ namespace ChroniclesOfRus.Editor
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             CreateArena();
             GameObject player = CreatePlayer(inputAsset);
-            CreateCamera(player.transform);
+            Transform cameraTransform = CreateCamera(player.transform);
+            AssignPlayerCamera(player, cameraTransform);
             CreateLight();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -84,7 +85,7 @@ namespace ChroniclesOfRus.Editor
             return player;
         }
 
-        private static void CreateCamera(Transform target)
+        private static Transform CreateCamera(Transform target)
         {
             GameObject cameraObject = new GameObject("Main Camera");
             cameraObject.tag = "MainCamera";
@@ -98,6 +99,15 @@ namespace ChroniclesOfRus.Editor
             SerializedObject cameraControllerObject = new SerializedObject(controller);
             cameraControllerObject.FindProperty("target").objectReferenceValue = target;
             cameraControllerObject.ApplyModifiedPropertiesWithoutUndo();
+            return cameraObject.transform;
+        }
+
+        private static void AssignPlayerCamera(GameObject player, Transform cameraTransform)
+        {
+            PlayerMovement movement = player.GetComponent<PlayerMovement>();
+            SerializedObject movementObject = new SerializedObject(movement);
+            movementObject.FindProperty("cameraTransform").objectReferenceValue = cameraTransform;
+            movementObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void CreateLight()

@@ -11,6 +11,8 @@ namespace ChroniclesOfRus.Input
 
         private InputActionMap playerMap;
         private InputAction moveAction;
+        private InputAction dodgeAction;
+        private bool isSubscribed;
 
         public Vector2 Move => IsInputEnabled && moveAction != null
             ? Vector2.ClampMagnitude(moveAction.ReadValue<Vector2>(), 1f)
@@ -18,7 +20,7 @@ namespace ChroniclesOfRus.Input
 
         public bool IsInputEnabled { get; private set; } = true;
 
-        public event Action DodgeRequested;
+        public event Action DodgePressed;
         public event Action LightAttackRequested;
         public event Action HeavyAttackRequested;
         public event Action AbilityRequested;
@@ -36,16 +38,12 @@ namespace ChroniclesOfRus.Input
 
             playerMap = inputActions.FindActionMap(actionMapName, true);
             moveAction = playerMap.FindAction("Move", true);
-            Subscribe("Dodge", OnDodge);
-            Subscribe("LightAttack", OnLightAttack);
-            Subscribe("HeavyAttack", OnHeavyAttack);
-            Subscribe("Ability", OnAbility);
-            Subscribe("Interact", OnInteract);
-            Subscribe("Pause", OnPause);
+            dodgeAction = playerMap.FindAction("Dodge", true);
         }
 
         private void OnEnable()
         {
+            SubscribeCallbacks();
             if (IsInputEnabled)
                 playerMap?.Enable();
         }
@@ -53,16 +51,7 @@ namespace ChroniclesOfRus.Input
         private void OnDisable()
         {
             playerMap?.Disable();
-        }
-
-        private void OnDestroy()
-        {
-            Unsubscribe("Dodge", OnDodge);
-            Unsubscribe("LightAttack", OnLightAttack);
-            Unsubscribe("HeavyAttack", OnHeavyAttack);
-            Unsubscribe("Ability", OnAbility);
-            Unsubscribe("Interact", OnInteract);
-            Unsubscribe("Pause", OnPause);
+            UnsubscribeCallbacks();
         }
 
         public void SetInputEnabled(bool value)
@@ -77,22 +66,41 @@ namespace ChroniclesOfRus.Input
                 playerMap.Disable();
         }
 
-        private void Subscribe(string actionName, Action<InputAction.CallbackContext> callback)
+        private void SubscribeCallbacks()
         {
-            playerMap.FindAction(actionName, true).performed += callback;
-        }
-
-        private void Unsubscribe(string actionName, Action<InputAction.CallbackContext> callback)
-        {
-            if (playerMap == null)
+            if (playerMap == null || isSubscribed)
                 return;
 
-            InputAction action = playerMap.FindAction(actionName, false);
-            if (action != null)
-                action.performed -= callback;
+            dodgeAction.performed += OnDodge;
+            Subscribe("LightAttack", OnLightAttack);
+            Subscribe("HeavyAttack", OnHeavyAttack);
+            Subscribe("Ability", OnAbility);
+            Subscribe("Interact", OnInteract);
+            Subscribe("Pause", OnPause);
+            isSubscribed = true;
         }
 
-        private void OnDodge(InputAction.CallbackContext _) => InvokeIfEnabled(DodgeRequested);
+        private void UnsubscribeCallbacks()
+        {
+            if (playerMap == null || !isSubscribed)
+                return;
+
+            dodgeAction.performed -= OnDodge;
+            Unsubscribe("LightAttack", OnLightAttack);
+            Unsubscribe("HeavyAttack", OnHeavyAttack);
+            Unsubscribe("Ability", OnAbility);
+            Unsubscribe("Interact", OnInteract);
+            Unsubscribe("Pause", OnPause);
+            isSubscribed = false;
+        }
+
+        private void Subscribe(string actionName, Action<InputAction.CallbackContext> callback) =>
+            playerMap.FindAction(actionName, true).performed += callback;
+
+        private void Unsubscribe(string actionName, Action<InputAction.CallbackContext> callback) =>
+            playerMap.FindAction(actionName, true).performed -= callback;
+
+        private void OnDodge(InputAction.CallbackContext _) => InvokeIfEnabled(DodgePressed);
         private void OnLightAttack(InputAction.CallbackContext _) => InvokeIfEnabled(LightAttackRequested);
         private void OnHeavyAttack(InputAction.CallbackContext _) => InvokeIfEnabled(HeavyAttackRequested);
         private void OnAbility(InputAction.CallbackContext _) => InvokeIfEnabled(AbilityRequested);
