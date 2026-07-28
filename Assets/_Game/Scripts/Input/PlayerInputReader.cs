@@ -12,6 +12,7 @@ namespace ChroniclesOfRus.Input
         private InputActionMap playerMap;
         private InputAction moveAction;
         private InputAction dodgeAction;
+        private InputAction attackAction;
         private bool isSubscribed;
 
         public Vector2 Move => IsInputEnabled && moveAction != null
@@ -21,6 +22,7 @@ namespace ChroniclesOfRus.Input
         public bool IsInputEnabled { get; private set; } = true;
 
         public event Action DodgePressed;
+        public event Action AttackPressed;
         public event Action LightAttackRequested;
         public event Action HeavyAttackRequested;
         public event Action AbilityRequested;
@@ -39,6 +41,7 @@ namespace ChroniclesOfRus.Input
             playerMap = inputActions.FindActionMap(actionMapName, true);
             moveAction = playerMap.FindAction("Move", true);
             dodgeAction = playerMap.FindAction("Dodge", true);
+            attackAction = playerMap.FindAction("Attack", true);
         }
 
         private void OnEnable()
@@ -72,6 +75,7 @@ namespace ChroniclesOfRus.Input
                 return;
 
             dodgeAction.performed += OnDodge;
+            attackAction.performed += OnAttack;
             Subscribe("LightAttack", OnLightAttack);
             Subscribe("HeavyAttack", OnHeavyAttack);
             Subscribe("Ability", OnAbility);
@@ -86,6 +90,7 @@ namespace ChroniclesOfRus.Input
                 return;
 
             dodgeAction.performed -= OnDodge;
+            attackAction.performed -= OnAttack;
             Unsubscribe("LightAttack", OnLightAttack);
             Unsubscribe("HeavyAttack", OnHeavyAttack);
             Unsubscribe("Ability", OnAbility);
@@ -101,6 +106,7 @@ namespace ChroniclesOfRus.Input
             playerMap.FindAction(actionName, true).performed -= callback;
 
         private void OnDodge(InputAction.CallbackContext _) => InvokeIfEnabled(DodgePressed);
+        private void OnAttack(InputAction.CallbackContext _) => InvokeIfEnabled(AttackPressed);
         private void OnLightAttack(InputAction.CallbackContext _) => InvokeIfEnabled(LightAttackRequested);
         private void OnHeavyAttack(InputAction.CallbackContext _) => InvokeIfEnabled(HeavyAttackRequested);
         private void OnAbility(InputAction.CallbackContext _) => InvokeIfEnabled(AbilityRequested);

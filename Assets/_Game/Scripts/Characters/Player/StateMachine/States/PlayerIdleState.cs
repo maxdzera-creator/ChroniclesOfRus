@@ -14,11 +14,13 @@ namespace ChroniclesOfRus.Characters.Player.StateMachine.States
         public override void Enter()
         {
             Input.DodgePressed += OnDodgePressed;
+            Input.AttackPressed += OnAttackPressed;
         }
 
         public override void Exit()
         {
             Input.DodgePressed -= OnDodgePressed;
+            Input.AttackPressed -= OnAttackPressed;
         }
 
         public override void Tick(float deltaTime)
@@ -33,6 +35,12 @@ namespace ChroniclesOfRus.Characters.Player.StateMachine.States
         {
             if (StateMachine.CanDodge)
                 StateMachine.ChangeState(PlayerStateId.Dodge);
+        }
+
+        private void OnAttackPressed()
+        {
+            if (StateMachine.CanAttack)
+                StateMachine.ChangeState(PlayerStateId.Attack);
         }
     }
 }

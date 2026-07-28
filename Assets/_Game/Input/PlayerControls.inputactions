@@ -7,6 +7,7 @@
       "actions": [
         { "name": "Move", "type": "Value", "id": "2df5e351-7290-45e7-92a0-afde37d835a6", "expectedControlType": "Vector2", "processors": "", "interactions": "", "initialStateCheck": true },
         { "name": "Dodge", "type": "Button", "id": "9055b8ea-e5d2-4719-82d9-6d0aa867b7c1", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+        { "name": "Attack", "type": "Button", "id": "b997ac15-2d24-4c48-a9fd-8c4c7229985f", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
         { "name": "LightAttack", "type": "Button", "id": "96fd66af-fd09-41c9-b323-72edbbf69fa5", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
         { "name": "HeavyAttack", "type": "Button", "id": "3e6bca4f-b463-416a-ab5e-d9917a016a38", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
         { "name": "Ability", "type": "Button", "id": "e2be9622-5bb7-4f8b-bdfb-a8f4e9121242", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
@@ -27,6 +28,8 @@
         { "name": "", "id": "e98f19c5-bdd1-4b68-98c0-5ad52b848912", "path": "<Gamepad>/leftStick", "interactions": "", "processors": "StickDeadzone", "groups": "Gamepad", "action": "Move", "isComposite": false, "isPartOfComposite": false },
         { "name": "", "id": "d22de44c-1747-445e-a481-f644b9984658", "path": "<Keyboard>/space", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "Dodge", "isComposite": false, "isPartOfComposite": false },
         { "name": "", "id": "4ca28040-07db-461c-b892-501513b7f35e", "path": "<Gamepad>/buttonEast", "interactions": "", "processors": "", "groups": "Gamepad", "action": "Dodge", "isComposite": false, "isPartOfComposite": false },
+        { "name": "", "id": "c025cb51-ee76-4422-bdcc-4ac6a6c83574", "path": "<Mouse>/leftButton", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "Attack", "isComposite": false, "isPartOfComposite": false },
+        { "name": "", "id": "03dc33aa-4508-484c-b5ae-c47dd9d814d5", "path": "<Gamepad>/rightTrigger", "interactions": "", "processors": "", "groups": "Gamepad", "action": "Attack", "isComposite": false, "isPartOfComposite": false },
         { "name": "", "id": "a3b77abc-3ac8-45a8-a01e-fcc4460c07cf", "path": "<Mouse>/leftButton", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "LightAttack", "isComposite": false, "isPartOfComposite": false },
         { "name": "", "id": "59a018e3-e7d1-4dcf-a9e3-333e873e3dd7", "path": "<Gamepad>/buttonWest", "interactions": "", "processors": "", "groups": "Gamepad", "action": "LightAttack", "isComposite": false, "isPartOfComposite": false },
         { "name": "", "id": "53ff067f-1001-4902-b105-c4b3eef6d01a", "path": "<Mouse>/rightButton", "interactions": "", "processors": "", "groups": "Keyboard&Mouse", "action": "HeavyAttack", "isComposite": false, "isPartOfComposite": false },
