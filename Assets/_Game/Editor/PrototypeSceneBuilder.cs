@@ -1,6 +1,8 @@
 using ChroniclesOfRus.CameraSystem;
 using ChroniclesOfRus.Characters.Player;
 using ChroniclesOfRus.Characters.Player.StateMachine;
+using ChroniclesOfRus.Characters.Enemy;
+using ChroniclesOfRus.Characters.Enemy.StateMachine;
 using ChroniclesOfRus.Combat;
 using ChroniclesOfRus.Input;
 using UnityEditor;
@@ -28,6 +30,7 @@ namespace ChroniclesOfRus.Editor
             GameObject player = CreatePlayer(inputAsset);
             CreateDamageableDummy();
             CreateDamageTestTrigger();
+            CreateBasicEnemy(player.transform);
             Transform cameraTransform = CreateCamera(player.transform);
             AssignPlayerCamera(player, cameraTransform);
             CreateLight();
@@ -113,6 +116,48 @@ namespace ChroniclesOfRus.Editor
             rigidbody.useGravity = false;
 
             triggerObject.AddComponent<DamageTestTrigger>();
+        }
+
+        private static void CreateBasicEnemy(Transform player)
+        {
+            GameObject enemy = new GameObject("Basic Enemy");
+            enemy.transform.position = new Vector3(0f, 0f, 6f);
+
+            CharacterController controller = enemy.AddComponent<CharacterController>();
+            controller.center = new Vector3(0f, 1f, 0f);
+            controller.height = 2f;
+            controller.radius = 0.45f;
+            controller.stepOffset = 0.3f;
+            controller.skinWidth = 0.08f;
+
+            HealthComponent health = enemy.AddComponent<HealthComponent>();
+            EnemyMovement movement = enemy.AddComponent<EnemyMovement>();
+            EnemyDetection detection = enemy.AddComponent<EnemyDetection>();
+            EnemyCombat combat = enemy.AddComponent<EnemyCombat>();
+            EnemyStateMachine stateMachine = enemy.AddComponent<EnemyStateMachine>();
+            EnemyAnimationController animationController = enemy.AddComponent<EnemyAnimationController>();
+            EnemyController enemyController = enemy.AddComponent<EnemyController>();
+
+            SerializedObject detectionObject = new SerializedObject(detection);
+            detectionObject.FindProperty("target").objectReferenceValue = player;
+            detectionObject.ApplyModifiedPropertiesWithoutUndo();
+
+            SerializedObject controllerObject = new SerializedObject(enemyController);
+            controllerObject.FindProperty("target").objectReferenceValue = player;
+            controllerObject.FindProperty("characterController").objectReferenceValue = controller;
+            controllerObject.FindProperty("health").objectReferenceValue = health;
+            controllerObject.FindProperty("movement").objectReferenceValue = movement;
+            controllerObject.FindProperty("detection").objectReferenceValue = detection;
+            controllerObject.FindProperty("combat").objectReferenceValue = combat;
+            controllerObject.FindProperty("stateMachine").objectReferenceValue = stateMachine;
+            controllerObject.FindProperty("animationController").objectReferenceValue = animationController;
+            controllerObject.ApplyModifiedPropertiesWithoutUndo();
+
+            GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            visual.name = "Visual";
+            Object.DestroyImmediate(visual.GetComponent<CapsuleCollider>());
+            visual.transform.SetParent(enemy.transform, false);
+            visual.transform.localPosition = Vector3.up;
         }
 
         private static Transform CreateCamera(Transform target)
