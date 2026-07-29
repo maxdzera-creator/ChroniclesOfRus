@@ -438,6 +438,16 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   enableDebugLogs: 1
+  attack:
+    attackDuration: 0.35
+    attackCooldown: 0.2
+    attackRotationSpeed: 1080
+    attackRange: 1.7
+    attackRadius: 0.8
+    attackDamage: 25
+    attackActiveStart: 0.1
+    attackActiveEnd: 0.22
+    enableDebugLogs: 1
 --- !u!114 &275572959
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -469,7 +479,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ec1944262a524e84928515c7715253c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ChroniclesOfRus.Game::ChroniclesOfRus.Input.PlayerInputReader
-  inputActions: {fileID: 0}
+  inputActions: {fileID: -944628639613478452, guid: f5758b7e7be774796990fa0385cdeb41, type: 3}
   actionMapName: Player
 --- !u!143 &275572961
 CharacterController:

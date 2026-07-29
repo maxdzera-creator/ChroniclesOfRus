@@ -1,6 +1,7 @@
 using ChroniclesOfRus.CameraSystem;
 using ChroniclesOfRus.Characters.Player;
 using ChroniclesOfRus.Characters.Player.StateMachine;
+using ChroniclesOfRus.Combat;
 using ChroniclesOfRus.Input;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -25,6 +26,8 @@ namespace ChroniclesOfRus.Editor
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             CreateArena();
             GameObject player = CreatePlayer(inputAsset);
+            CreateDamageableDummy();
+            CreateDamageTestTrigger();
             Transform cameraTransform = CreateCamera(player.transform);
             AssignPlayerCamera(player, cameraTransform);
             CreateLight();
@@ -74,6 +77,8 @@ namespace ChroniclesOfRus.Editor
 
             player.AddComponent<PlayerMovement>();
             player.AddComponent<PlayerStateMachine>();
+            player.AddComponent<HealthComponent>();
+            player.AddComponent<PlayerDamageReceiver>();
             player.AddComponent<PlayerAnimationController>();
 
             GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
@@ -83,6 +88,31 @@ namespace ChroniclesOfRus.Editor
             visual.transform.localPosition = Vector3.up;
 
             return player;
+        }
+
+        private static void CreateDamageableDummy()
+        {
+            GameObject dummy = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            dummy.name = "Damageable Dummy";
+            dummy.transform.position = new Vector3(0f, 1f, 1.7f);
+            dummy.AddComponent<HealthComponent>();
+            dummy.AddComponent<DamageableDummy>();
+        }
+
+        private static void CreateDamageTestTrigger()
+        {
+            GameObject triggerObject = new GameObject("Damage Test Trigger");
+            triggerObject.transform.position = new Vector3(-3f, 0.5f, 0f);
+
+            BoxCollider trigger = triggerObject.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+            trigger.size = new Vector3(1.5f, 1f, 1.5f);
+
+            Rigidbody rigidbody = triggerObject.AddComponent<Rigidbody>();
+            rigidbody.isKinematic = true;
+            rigidbody.useGravity = false;
+
+            triggerObject.AddComponent<DamageTestTrigger>();
         }
 
         private static Transform CreateCamera(Transform target)

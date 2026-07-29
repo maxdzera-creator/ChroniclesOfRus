@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ChroniclesOfRus.Combat;
 using ChroniclesOfRus.Input;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ namespace ChroniclesOfRus.Characters.Player.StateMachine.States
 
         private readonly Collider[] hitBuffer = new Collider[HitBufferSize];
         private readonly HashSet<Collider> hitColliders = new();
+        private readonly HashSet<IDamageable> damageableTargets = new();
+        private readonly HashSet<IDamageable> damagedTargets = new();
 
         private Vector3 attackDirection;
         private float elapsedTime;
@@ -17,6 +20,8 @@ namespace ChroniclesOfRus.Characters.Player.StateMachine.States
 
         public override PlayerStateId Id => PlayerStateId.Attack;
         public IReadOnlyCollection<Collider> HitColliders => hitColliders;
+        public IReadOnlyCollection<IDamageable> DamageableTargets => damageableTargets;
+        public int DamagedTargetCount => damagedTargets.Count;
 
         public PlayerAttackState(PlayerStateMachine stateMachine, PlayerInputReader input, PlayerMovement movement)
             : base(stateMachine, input, movement)
@@ -34,6 +39,8 @@ namespace ChroniclesOfRus.Characters.Player.StateMachine.States
             elapsedTime = 0f;
             finished = false;
             hitColliders.Clear();
+            damageableTargets.Clear();
+            damagedTargets.Clear();
             Movement.BeginControlledMovement();
             StateMachine.NotifyAttackStarted();
             UpdateHitWindow();
@@ -78,8 +85,38 @@ namespace ChroniclesOfRus.Characters.Player.StateMachine.States
             for (int i = 0; i < hitCount; i++)
             {
                 Collider target = hitBuffer[i];
-                if (target != null && target.transform.root != Movement.transform.root)
-                    hitColliders.Add(target);
+                if (target == null || target.transform.root == Movement.transform.root ||
+                    !hitColliders.Add(target))
+                {
+                    continue;
+                }
+
+                IDamageable damageable = target.GetComponent<IDamageable>();
+                if (damageable == null)
+                    damageable = target.GetComponentInParent<IDamageable>();
+                if (damageable == null || !damageableTargets.Add(damageable))
+                    continue;
+                if (!damageable.IsAlive || settings.attackDamage <= 0f)
+                {
+                    continue;
+                }
+
+                Vector3 hitPoint = target.ClosestPoint(Movement.transform.position);
+                Vector3 hitDirection = target.transform.position - Movement.transform.position;
+                hitDirection.y = 0f;
+                if (hitDirection.sqrMagnitude <= 0.0001f)
+                    hitDirection = attackDirection;
+
+                DamageInfo damageInfo = new(
+                    settings.attackDamage,
+                    Movement.gameObject,
+                    hitPoint,
+                    hitDirection,
+                    DamageType.Physical);
+                bool canApplyDamage = damageable.CanReceiveDamage;
+                damageable.ReceiveDamage(damageInfo);
+                if (canApplyDamage)
+                    damagedTargets.Add(damageable);
             }
         }
 
@@ -91,7 +128,11 @@ namespace ChroniclesOfRus.Characters.Player.StateMachine.States
                 elapsedTime < settings.attackActiveEnd;
 
             if (StateMachine.IsAttackHitWindowOpen && !shouldBeOpen)
-                StateMachine.LogAttack($"Targets found: {hitColliders.Count}");
+            {
+                StateMachine.LogAttack($"Colliders found: {hitColliders.Count}");
+                StateMachine.LogAttack($"Unique damageable targets: {damageableTargets.Count}");
+                StateMachine.LogAttack($"Targets damaged: {damagedTargets.Count}");
+            }
 
             StateMachine.SetAttackHitWindow(shouldBeOpen);
         }

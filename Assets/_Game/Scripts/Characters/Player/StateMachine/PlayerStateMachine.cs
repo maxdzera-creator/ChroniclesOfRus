@@ -28,6 +28,7 @@ namespace ChroniclesOfRus.Characters.Player.StateMachine
         [Min(0f)] public float attackRotationSpeed = 1080f;
         [Min(0f)] public float attackRange = 1.7f;
         [Min(0.01f)] public float attackRadius = 0.8f;
+        [Min(0f)] public float attackDamage = 25f;
         [Min(0f)] public float attackActiveStart = 0.10f;
         [Min(0f)] public float attackActiveEnd = 0.22f;
         public bool enableDebugLogs = true;
@@ -217,6 +218,7 @@ namespace ChroniclesOfRus.Characters.Player.StateMachine
             attack.attackRotationSpeed = Mathf.Max(0f, attack.attackRotationSpeed);
             attack.attackRange = Mathf.Max(0f, attack.attackRange);
             attack.attackRadius = Mathf.Max(0.01f, attack.attackRadius);
+            attack.attackDamage = Mathf.Max(0f, attack.attackDamage);
             attack.attackActiveStart = Mathf.Clamp(
                 attack.attackActiveStart, 0f, attack.attackDuration);
             attack.attackActiveEnd = Mathf.Clamp(
